@@ -13,10 +13,10 @@ contract('UpdatableConsumer', () => {
   const ensRoot = namehash.hash()
   const tld = 'test'
   const tldSubnode = namehash.hash(tld)
-  const tokenDomain = 'link'
-  const tokenHash = namehash.hash(`${tokenDomain}.${tld}`)
-  const oracleDomain = 'oracle'
-  const oracleHash = namehash.hash(`${oracleDomain}.${tld}`)
+  const tokenSubdomain = 'link'
+  const tokenSubnode = namehash.hash(`${tokenSubdomain}.${tld}`)
+  const oracleSubdomain = 'oracle'
+  const oracleSubnode = namehash.hash(`${oracleSubdomain}.${tld}`)
   const specId = web3.sha3('someSpecID')
   const newOracleAddress = '0xf000000000000000000000000000000000000ba7'
   const currency = 'USD'
@@ -36,12 +36,12 @@ contract('UpdatableConsumer', () => {
     await ensResolver.setAddr(tldSubnode, oc.address, {from: oracleNode})
 
      // register token subdomain
-    await ens.setSubnodeOwner(tldSubnode, web3.sha3(tokenDomain), oracleNode, {from: oracleNode})
-    await ensResolver.setAddr(tokenHash, link.address, {from: oracleNode})
+    await ens.setSubnodeOwner(tldSubnode, web3.sha3(tokenSubdomain), oracleNode, {from: oracleNode})
+    await ensResolver.setAddr(tokenSubnode, link.address, {from: oracleNode})
 
     // register oracle subdomain
-    await ens.setSubnodeOwner(tldSubnode, web3.sha3(oracleDomain), oracleNode, {from: oracleNode})
-    await ensResolver.setAddr(oracleHash, oc.address, {from: oracleNode})
+    await ens.setSubnodeOwner(tldSubnode, web3.sha3(oracleSubdomain), oracleNode, {from: oracleNode})
+    await ensResolver.setAddr(oracleSubnode, oc.address, {from: oracleNode})
 
     uc = await deploy(sourcePath, specId, ens.address, tldSubnode)
   })
@@ -59,7 +59,7 @@ contract('UpdatableConsumer', () => {
   describe('#updateOracle', () => {
     describe('when the ENS resolver has been updated', () => {
       beforeEach(async () => {
-        await ensResolver.setAddr(oracleHash, newOracleAddress, {from: oracleNode})
+        await ensResolver.setAddr(oracleSubnode, newOracleAddress, {from: oracleNode})
       })
 
       it("updates the contract's oracle address", async () => {
@@ -101,7 +101,7 @@ contract('UpdatableConsumer', () => {
 
     context('when the oracle address is updated before a request is fulfilled', () => {
       beforeEach(async () => {
-        await ensResolver.setAddr(oracleHash, newOracleAddress, {from: oracleNode})
+        await ensResolver.setAddr(oracleSubnode, newOracleAddress, {from: oracleNode})
         await uc.updateOracle()
         assert.equal(newOracleAddress, await uc.publicOracle.call())
       })
